@@ -27,7 +27,6 @@ app.use("/uploads", express.static(uploadsDir));
 // ===== MongoDB Connect =====
 const mongoUrl = process.env.MONGO_URL || "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority";
 mongoose.set('bufferCommands', false);
-mongoose.set('bufferMaxEntries', 0);
 mongoose
   .connect(mongoUrl, {
     useNewUrlParser: true,
@@ -36,7 +35,6 @@ mongoose
     socketTimeoutMS: 60000,
     connectTimeoutMS: 60000,
     maxPoolSize: 10,
-    bufferMaxEntries: 0,
     bufferCommands: false
   })
   .then(async () => {
