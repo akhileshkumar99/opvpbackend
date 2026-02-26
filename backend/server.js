@@ -39,7 +39,27 @@ mongoose
     bufferMaxEntries: 0,
     bufferCommands: false
   })
-  .then(() => console.log("MongoDB Connected ✅"))
+  .then(async () => {
+    console.log("MongoDB Connected ✅");
+    // Create default admin user
+    const User = require('./models/User');
+    try {
+      const adminExists = await User.findOne({ role: 'admin' });
+      if (!adminExists) {
+        await User.create({
+          username: 'admin',
+          password: 'admin123',
+          role: 'admin',
+          name: 'School Admin',
+          email: 'admin@opvkolhampur.com',
+          phone: '1234567890'
+        });
+        console.log('Default admin user created: admin / admin123');
+      }
+    } catch (err) {
+      console.log('Admin creation error:', err.message);
+    }
+  })
   .catch((err) => console.log("MongoDB Error ❌", err));
 
 // ===== Routes =====
