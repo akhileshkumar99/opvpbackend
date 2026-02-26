@@ -1,15 +1,12 @@
 {
-  "name": "opvp-kolhampur-school",
+  "name": "opvp-kolhampur-backend",
   "version": "1.0.0",
-  "description": "OPVP Kolhampur Public School Management System",
+  "description": "OPVP Kolhampur Public School Backend",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "npm run dev --prefix backend",
-    "install-backend": "npm install --prefix backend",
-    "install-frontend": "npm install --prefix frontend",
-    "build-frontend": "npm run build --prefix frontend",
-    "postinstall": "npm run install-backend && npm run install-frontend && npm run build-frontend"
+    "dev": "nodemon backend/server.js",
+    "install-backend": "cd backend && npm install"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -18,7 +15,7 @@
     "cloudinary": "^2.9.0",
     "multer": "^2.0.2"
   },
-  "keywords": ["school", "management", "system", "react", "nodejs"],
-  "author": "Your Name",
+  "keywords": ["school", "management", "backend"],
+  "author": "Akhilesh",
   "license": "MIT"
 }

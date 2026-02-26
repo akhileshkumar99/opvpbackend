@@ -1,86 +1,84 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const User = require('./models/User');
 
 const app = express();
 
-// ===== Middleware =====
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ===== Root Test Route =====
-app.get("/", (req, res) => {
-  res.send("OPVP BACKEND RUNNING 🚀");
-});
-
-// ===== Upload Folder Create =====
-const uploadsDir = path.join(__dirname, "uploads");
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const tempDir = path.join(__dirname, 'uploads/temp');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
-app.use("/uploads", express.static(uploadsDir));
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
 
-// ===== Routes =====
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/students", require("./routes/students"));
-app.use("/api/teachers", require("./routes/teachers"));
-app.use("/api/fees", require("./routes/fees"));
-app.use("/api/income", require("./routes/income"));
-app.use("/api/expense", require("./routes/expense"));
-app.use("/api/attendance", require("./routes/attendance"));
-app.use("/api/exams", require("./routes/exams"));
-app.use("/api/results", require("./routes/results"));
-app.use("/api/notices", require("./routes/notices"));
-app.use("/api/classes", require("./routes/classes"));
-app.use("/api/gallery", require("./routes/gallery"));
-app.use("/api/dashboard", require("./routes/dashboard"));
-app.use("/api/admission", require("./routes/admission"));
-app.use("/api/contact", require("./routes/contact"));
-app.use("/api/upload", require("./routes/upload"));
-app.use("/api/slider", require("./routes/slider"));
-
-// ===== Error handler =====
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ message: "Server Error" });
-});
-
-// ===== MongoDB Connect =====
-const mongoUrl = "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority&connectTimeoutMS=60000&socketTimeoutMS=60000&serverSelectionTimeoutMS=60000";
-
-mongoose.connect(mongoUrl)
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority')
   .then(async () => {
-    console.log("MongoDB Connected ✅");
-    
-    // Create default admin user
-    const User = require('./models/User');
-    try {
-      const adminExists = await User.findOne({ role: 'admin' });
-      if (!adminExists) {
-        await User.create({
-          username: 'admin',
-          password: 'admin123',
-          role: 'admin',
-          name: 'School Admin',
-          email: 'admin@opvkolhampur.com',
-          phone: '1234567890'
-        });
-        console.log('Default admin user created: admin / admin123');
-      }
-    } catch (err) {
-      console.log('Admin creation error:', err.message);
+    console.log('MongoDB Connected');
+    // Create default admin user if not exists
+    const adminExists = await User.findOne({ role: 'admin' });
+    if (!adminExists) {
+      await User.create({
+        username: 'admin',
+        password: 'admin123',
+        role: 'admin',
+        name: 'School Admin',
+        email: 'admin@opvkolhampur.com',
+        phone: '1234567890'
+      });
+      console.log('Default admin user created: admin / admin123');
     }
   })
-  .catch((err) => console.log("MongoDB Error ❌", err));
+  .catch(err => console.log('MongoDB Connection Error:', err));
 
-// ===== Railway Port =====
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/students', require('./routes/students'));
+app.use('/api/teachers', require('./routes/teachers'));
+app.use('/api/fees', require('./routes/fees'));
+app.use('/api/income', require('./routes/income'));
+app.use('/api/expense', require('./routes/expense'));
+app.use('/api/attendance', require('./routes/attendance'));
+app.use('/api/exams', require('./routes/exams'));
+app.use('/api/results', require('./routes/results'));
+app.use('/api/notices', require('./routes/notices'));
+app.use('/api/classes', require('./routes/classes'));
+app.use('/api/gallery', require('./routes/gallery'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/admission', require('./routes/admission'));
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/slider', require('./routes/slider'));
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Error:', error);
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File too large' });
+  }
+  res.status(500).json({ message: error.message || 'Internal server error' });
 });
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+}
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
