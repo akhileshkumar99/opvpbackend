@@ -57,8 +57,16 @@ const connectDB = async () => {
     } catch (err) {
       console.log('Admin creation error:', err.message);
     }
+    
+    // Start server only after DB connection
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+      console.log("Server running on port " + PORT);
+    });
+    
   } catch (err) {
     console.log("MongoDB Error ❌", err);
+    process.exit(1);
   }
 };
 
@@ -89,9 +97,4 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Server Error" });
 });
 
-// ===== Railway Port =====
-const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});
