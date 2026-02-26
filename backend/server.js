@@ -24,6 +24,31 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use("/uploads", express.static(uploadsDir));
 
+// ===== Routes =====
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/students", require("./routes/students"));
+app.use("/api/teachers", require("./routes/teachers"));
+app.use("/api/fees", require("./routes/fees"));
+app.use("/api/income", require("./routes/income"));
+app.use("/api/expense", require("./routes/expense"));
+app.use("/api/attendance", require("./routes/attendance"));
+app.use("/api/exams", require("./routes/exams"));
+app.use("/api/results", require("./routes/results"));
+app.use("/api/notices", require("./routes/notices"));
+app.use("/api/classes", require("./routes/classes"));
+app.use("/api/gallery", require("./routes/gallery"));
+app.use("/api/dashboard", require("./routes/dashboard"));
+app.use("/api/admission", require("./routes/admission"));
+app.use("/api/contact", require("./routes/contact"));
+app.use("/api/upload", require("./routes/upload"));
+app.use("/api/slider", require("./routes/slider"));
+
+// ===== Error handler =====
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: "Server Error" });
+});
+
 // ===== MongoDB Connect =====
 const mongoUrl = process.env.MONGO_URL || "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority";
 
@@ -58,43 +83,17 @@ const connectDB = async () => {
       console.log('Admin creation error:', err.message);
     }
     
-    // Start server only after DB connection
-    const PORT = process.env.PORT || 8080;
-    app.listen(PORT, () => {
-      console.log("Server running on port " + PORT);
-    });
-    
   } catch (err) {
     console.log("MongoDB Error ❌", err);
-    process.exit(1);
   }
 };
 
 connectDB();
 
-// ===== Routes =====
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/students", require("./routes/students"));
-app.use("/api/teachers", require("./routes/teachers"));
-app.use("/api/fees", require("./routes/fees"));
-app.use("/api/income", require("./routes/income"));
-app.use("/api/expense", require("./routes/expense"));
-app.use("/api/attendance", require("./routes/attendance"));
-app.use("/api/exams", require("./routes/exams"));
-app.use("/api/results", require("./routes/results"));
-app.use("/api/notices", require("./routes/notices"));
-app.use("/api/classes", require("./routes/classes"));
-app.use("/api/gallery", require("./routes/gallery"));
-app.use("/api/dashboard", require("./routes/dashboard"));
-app.use("/api/admission", require("./routes/admission"));
-app.use("/api/contact", require("./routes/contact"));
-app.use("/api/upload", require("./routes/upload"));
-app.use("/api/slider", require("./routes/slider"));
-
-// ===== Error handler =====
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ message: "Server Error" });
+// ===== Railway Port =====
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
 
 
