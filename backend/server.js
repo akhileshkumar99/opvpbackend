@@ -24,6 +24,22 @@ if (!fs.existsSync(tempDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
+// Root route for API testing
+app.get('/', (req, res) => {
+  res.json({
+    message: 'OPVP Kolhampur Public School Backend API',
+    status: 'Running',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      students: '/api/students',
+      teachers: '/api/teachers',
+      gallery: '/api/gallery',
+      notices: '/api/notices'
+    }
+  });
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority')
   .then(async () => {
@@ -72,13 +88,7 @@ app.use((error, req, res, next) => {
   res.status(500).json({ message: error.message || 'Internal server error' });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-  });
-}
+// Backend-only deployment - no frontend serving
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
