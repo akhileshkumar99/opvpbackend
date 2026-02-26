@@ -26,19 +26,19 @@ app.use("/uploads", express.static(uploadsDir));
 
 // ===== MongoDB Connect =====
 const mongoUrl = process.env.MONGO_URL || "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority";
-mongoose.set('bufferCommands', false);
-mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 60000,
-    socketTimeoutMS: 60000,
-    connectTimeoutMS: 60000,
-    maxPoolSize: 10,
-    bufferCommands: false
-  })
-  .then(async () => {
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(mongoUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 60000,
+      socketTimeoutMS: 60000,
+      connectTimeoutMS: 60000,
+      maxPoolSize: 10
+    });
     console.log("MongoDB Connected ✅");
+    
     // Create default admin user
     const User = require('./models/User');
     try {
@@ -57,8 +57,12 @@ mongoose
     } catch (err) {
       console.log('Admin creation error:', err.message);
     }
-  })
-  .catch((err) => console.log("MongoDB Error ❌", err));
+  } catch (err) {
+    console.log("MongoDB Error ❌", err);
+  }
+};
+
+connectDB();
 
 // ===== Routes =====
 app.use("/api/auth", require("./routes/auth"));
