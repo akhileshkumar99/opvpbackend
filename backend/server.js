@@ -50,18 +50,10 @@ app.use((err, req, res, next) => {
 });
 
 // ===== MongoDB Connect =====
-const mongoUrl = process.env.MONGO_URL || "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority";
+const mongoUrl = "mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/opvp_school?retryWrites=true&w=majority&connectTimeoutMS=60000&socketTimeoutMS=60000&serverSelectionTimeoutMS=60000";
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(mongoUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 60000,
-      socketTimeoutMS: 60000,
-      connectTimeoutMS: 60000,
-      maxPoolSize: 10
-    });
+mongoose.connect(mongoUrl)
+  .then(async () => {
     console.log("MongoDB Connected ✅");
     
     // Create default admin user
@@ -82,13 +74,8 @@ const connectDB = async () => {
     } catch (err) {
       console.log('Admin creation error:', err.message);
     }
-    
-  } catch (err) {
-    console.log("MongoDB Error ❌", err);
-  }
-};
-
-connectDB();
+  })
+  .catch((err) => console.log("MongoDB Error ❌", err));
 
 // ===== Railway Port =====
 const PORT = process.env.PORT || 8080;
