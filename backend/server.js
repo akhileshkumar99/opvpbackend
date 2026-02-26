@@ -25,13 +25,13 @@ if (!fs.existsSync(tempDir)) {
 app.use('/uploads', express.static(uploadsDir));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/opv_kolhampur_school')
-  .then(async () => {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://akhilesh:akhilesh5044@cluster0.tpzkao7.mongodb.net/?appName=Cluster0')
+  .then(() => {
     console.log('MongoDB Connected');
     // Create default admin user if not exists
-    const adminExists = await User.findOne({ role: 'admin' });
+    const adminExists = User.findOne({ role: 'admin' });
     if (!adminExists) {
-      await User.create({
+      User.create({
         username: 'admin',
         password: 'admin123',
         role: 'admin',
